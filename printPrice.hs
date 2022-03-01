@@ -7,6 +7,8 @@ complett = ("complett",[("rtx 3060",2400),("rtx3070", 4500),("rtx3080", 11000)])
 
 netonnet = ("Net on Net",[("rtx 3050", 1000),("rtx 3060",2700),("rtx3070", 3300),("rtx3080", 14000)])
 
+-- test
+
 -- TODO:
 -- börja med att skapa en CSV fil
 -- Printa första raden i CSV filen: Model,butik1,butik2,butik3
