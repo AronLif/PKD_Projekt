@@ -30,17 +30,20 @@ fstMerge (a,b) (y:ys) =
     if a == fst y then (a,b,snd y)
     else fstMerge (a,b) ys
 
-sndMerge (a,b,c) [] = [(a,b,c,0)]
+sndMerge (a,b,c) [] = (a,b,c,0)
 sndMerge (a,b,c) (z:zs) = 
-    if a == fst z then [(a,b,c,snd z)]
+    if a == fst z then (a,b,c,snd z)
     else sndMerge (a,b,c) zs
 
+tupleToString (a,b,c,d) = a ++ ";" ++ (show b) ++";" ++ (show c) ++ ";" ++ (show d) 
 
 
+createFile tuple1 tuple2 tuple3 = do
+    writeFile "RTX card name.csv" ("model;" ++ fst tuple1 ++ 
+                                    ";" ++ fst tuple2 ++ ";"
+                                    ++ fst tuple3 ++ "n")
+    appendFile "RTX card name.csv" (tupleToString (tupleToList tuple1 tuple2 tuple3))
 
-
-createFile ((a,b,c):xs) = do
-                        writeFile "RTX card name.csv" ("model;" ++ a ++ ";" ++ b ++ ";" ++ c)
     
 
 -- test
