@@ -22,16 +22,15 @@ merge (x:xs) (y:ys) (z:zs) =
     
 -- mergeAUX (a,b) [] = []
 mergeAUX (a,b) (y:ys) (z:zs) =
-    (a,b)
-    --fstMerge (a,b) (y:ys)
-    --sndMerge (fstMerge (a,b) (y:ys)) (z:zs)
+    sndMerge (fstMerge (a,b) (y:ys)) (z:zs)
 
-fstMerge (a,b) [] = [(a,b,"--")]
-fstMerge (a,b) (x:xs) = 
-    if a == fst x then [(a,b,snd x)]
-    else fstMerge (a,b) (xs)
+fstMerge :: (String,Integer) -> [(String,Integer)] -> (String,Integer,Integer)
+fstMerge (a,b) [] = (a,b,0)
+fstMerge (a,b) (y:ys) = 
+    if a == fst y then (a,b,snd y)
+    else fstMerge (a,b) ys
 
-sndMerge (a,b,c) [] = [(a,b,c,"--")]
+sndMerge (a,b,c) [] = [(a,b,c,0)]
 sndMerge (a,b,c) (z:zs) = 
     if a == fst z then [(a,b,c,snd z)]
     else sndMerge (a,b,c) zs
