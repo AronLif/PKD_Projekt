@@ -36,18 +36,35 @@ module PrintPrice
 
         firstTitle = "modell"
 
-        
+        {-  createCsvText ((ax,bx,cx):xs)
+            This functions creates a string with speciall characthers so that the CSV file will know 
+            how to separate the items.
+            PRE:        True
+            RETURNS:    A String with all the data collected and modified for the CSV file
+            VARIANT:    length of recived list     
+            EXAMPLES:   createCsvText [("foo","bar","foo++"),("test1","test2","test3")]
+                        "foo;bar;foo++\ntest1;test2;test3\n"
+        -}
         createCsvText :: MergedProductInfo -> CsvInfo
         createCsvText [] = []
-        createCsvText ((a,b,c):xs) = 
-            a ++ ";" ++ b ++ ";" ++ c ++ "\n" ++ createCsvText xs
+        createCsvText ((ax,bx,cx):xs) = 
+            ax ++ ";" ++ bx ++ ";" ++ cx ++ "\n" ++ createCsvText xs
 
-               
+        
+        {-  mergeProductInfo listX listY 
+            This function matches and merges the data in the two lists of tuples.
+            If one tuple has a product that the first tuple don't have then it will add "--" by the price section
+            PRE:        True
+            RETURNS:    A singe list with tuples with the price data merged
+            EXAMPLES:   mergeProductInfo [("rtx2070","3000")] [("rtx2070","5000"),("rtx 2060","2000")]
+                        [("rtx2070","3000","5000"),("rtx 2060","--","2000")]
+        -}       
         mergeProductInfo :: ProductsInfo -> ProductsInfo -> MergedProductInfo
-        mergeProductInfo tupleX tupleY = 
-            (matchProducts tupleX tupleY) ++ (addUniqeProduct (matchProducts tupleX tupleY) tupleY)
+        mergeProductInfo listX listY = 
+            (matchProducts listX listY) ++ (addUniqeProducts (matchProducts listX listY) listY)
 
 
+        
         matchProducts :: ProductsInfo -> ProductsInfo -> MergedProductInfo
         matchProducts [] _ = []
         matchProducts (x:xs) webList =
@@ -61,17 +78,17 @@ module PrintPrice
             else matchProductsAux (a,b) ys
 
 
-        addUniqeProduct :: MergedProductInfo-> ProductsInfo -> MergedProductInfo
-        addUniqeProduct webList [] = []
-        addUniqeProduct webList (y:ys) =
-            (addUniqeProductAux webList y ) ++ (addUniqeProduct webList ys)
+        addUniqeProducts :: MergedProductInfo-> ProductsInfo -> MergedProductInfo
+        addUniqeProducts webList [] = []
+        addUniqeProducts webList (y:ys) =
+            (addUniqeProductsAux webList y ) ++ (addUniqeProducts webList ys)
 
         
-        addUniqeProductAux :: MergedProductInfo -> SingleProductInfo -> MergedProductInfo
-        addUniqeProductAux [] y@(ay,by) = [(ay,"--",by)]
-        addUniqeProductAux ((ax,bx,cx):xs) y@(ay,by)
+        addUniqeProductsAux :: MergedProductInfo -> SingleProductInfo -> MergedProductInfo
+        addUniqeProductsAux [] y@(ay,by) = [(ay,"--",by)]
+        addUniqeProductsAux ((ax,bx,cx):xs) y@(ay,by)
             | ax == ay = []
-            | otherwise = addUniqeProductAux xs y
+            | otherwise = addUniqeProductsAux xs y
 
 
 
