@@ -61,34 +61,58 @@ module PrintPrice
         -}       
         mergeProductInfo :: ProductsInfo -> ProductsInfo -> MergedProductInfo
         mergeProductInfo listX listY = 
-            (matchProducts listX listY) ++ (addUniqeProducts (matchProducts listX listY) listY)
+            (matchProducts listX listY) ++ (addUniqueProducts (matchProducts listX listY) listY)
 
 
-        
+        {-  matchProducts (x:xs) webList
+            This function takes two lists and calls on a helper function to match all the items in the first list with items in the second list.
+            if and item exists in both list it will add the prices of both lists. if and items only exists in the first list the price will be "--"
+            where the second list would have had it'äs price
+            PRE:        True
+            RETURNS:    A list of tuples with [(item,price1,price2)]
+            VARIANT:    Length of (x:xs)
+            EXAMPLES:   matchProducts [("rtx2070","2000"),("rtx2060","3000")] [("rtx2070","2500"),("rtx2050","1000")]
+                        [("rtx2070","2000","2500"),("rtx2060","3000","--")]
+        -}
         matchProducts :: ProductsInfo -> ProductsInfo -> MergedProductInfo
         matchProducts [] _ = []
         matchProducts (x:xs) webList =
             matchProductsAux x webList ++ (matchProducts xs webList)
 
-        
+        {-  matchProductsAux (a,b) (y:ys)
+            This function checks if the value a exists in (y:ys). 
+            if it does it returns the price in (y:ys) that is assosicated with a. = [(a,b,y-price)]
+            if the a doesn't exist in (y:ys) it will return "--" instead of y-price = [(a,b,"--")]
+            PRE:        True
+            RETURNS:    a list with a single tuple containing the data as stated above
+            VARIANT:    (y:ys)
+            EXAMPLES:   matchProductsAux  ("rtx2070","2000") [("rtx2070","2500"),("rtx2050","1000")]
+                        [("rtx2070","2000","2500")]
+        -}
         matchProductsAux :: SingleProductInfo -> ProductsInfo -> MergedProductInfo
         matchProductsAux (a,b) [] = [(a,b,"--")]
         matchProductsAux (a,b) (y:ys) =
             if a == fst y then [(a,b,snd y)]
             else matchProductsAux (a,b) ys
 
-
-        addUniqeProducts :: MergedProductInfo-> ProductsInfo -> MergedProductInfo
-        addUniqeProducts webList [] = []
-        addUniqeProducts webList (y:ys) =
-            (addUniqeProductsAux webList y ) ++ (addUniqeProducts webList ys)
+        {-  addUniqueProducts weblist (y:ys)
+            this functions checks the (y:ys) list and 
+            PRE:       
+            RETURNS:       
+            VARIANT:     
+            EXAMPLES:   
+        -}
+        addUniqueProducts :: MergedProductInfo-> ProductsInfo -> MergedProductInfo
+        addUniqueProducts webList [] = []
+        addUniqueProducts webList (y:ys) =
+            (addUniqueProductsAux webList y ) ++ (addUniqueProducts webList ys)
 
         
-        addUniqeProductsAux :: MergedProductInfo -> SingleProductInfo -> MergedProductInfo
-        addUniqeProductsAux [] y@(ay,by) = [(ay,"--",by)]
-        addUniqeProductsAux ((ax,bx,cx):xs) y@(ay,by)
+        addUniqueProductsAux :: MergedProductInfo -> SingleProductInfo -> MergedProductInfo
+        addUniqueProductsAux [] y@(ay,by) = [(ay,"--",by)]
+        addUniqueProductsAux ((ax,bx,cx):xs) y@(ay,by)
             | ax == ay = []
-            | otherwise = addUniqeProductsAux xs y
+            | otherwise = addUniqueProductsAux xs y
 
 
 
