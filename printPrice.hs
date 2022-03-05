@@ -36,6 +36,7 @@ module PrintPrice
 
         firstTitle = "modell"
 
+
         {-  createCsvText ((ax,bx,cx):xs)
             This functions creates a string with speciall characthers so that the CSV file will know 
             how to separate the items.
@@ -79,6 +80,7 @@ module PrintPrice
         matchProducts (x:xs) webList =
             matchProductsAux x webList ++ (matchProducts xs webList)
 
+
         {-  matchProductsAux (a,b) (y:ys)
             This function checks if the value a exists in (y:ys). 
             if it does it returns the price in (y:ys) that is assosicated with a. = [(a,b,y-price)]
@@ -95,19 +97,31 @@ module PrintPrice
             if a == fst y then [(a,b,snd y)]
             else matchProductsAux (a,b) ys
 
+
         {-  addUniqueProducts weblist (y:ys)
-            this functions checks the (y:ys) list and 
-            PRE:       
-            RETURNS:       
-            VARIANT:     test
-            EXAMPLES:   
+            this functions calls on a helper that returns all the items in the (y:ys) list that aren't in the mergedList
+            PRE:        True
+            RETURNS:    A list of all items in (y:ys) list that aren't in the mergedList
+            VARIANT:    length of (y:ys)
+            EXAMPLES:   addUniqueProducts [("rtx2070","2000","2500")] [("rtx2070","2500"),("rtx2050","1000")]
+                        [("rtx2050","--","1000")]
         -}
         addUniqueProducts :: MergedProductInfo-> ProductsInfo -> MergedProductInfo
-        addUniqueProducts webList [] = []
-        addUniqueProducts webList (y:ys) =
-            (addUniqueProductsAux webList y ) ++ (addUniqueProducts webList ys)
+        addUniqueProducts mergedList [] = []
+        addUniqueProducts mergedList (y:ys) =
+            (addUniqueProductsAux mergedList y ) ++ (addUniqueProducts mergedList ys) 
 
-        
+
+        {-  addUniqueProductsAux ((ax,bx,cx):xs) y@(ay,by)
+            this function checks if the ay value exists in the ((ax,bx,cx):xs) list.
+            if it does it returns []
+            if the ay doesn't exist in the ((ax,bx,cx):xs) list it will return = [(ay,"--",by)]
+            PRE:        True
+            RETURNS:    a list
+            VARIANT:    length of ((ax,bx,cx):xs)
+            EXAMPLES:   addUniqueProductsAux [("rtx2070","2000","2500")] ("rtx2050","2000")
+                        [("rtx2050","--","2000")]
+        -} 
         addUniqueProductsAux :: MergedProductInfo -> SingleProductInfo -> MergedProductInfo
         addUniqueProductsAux [] y@(ay,by) = [(ay,"--",by)]
         addUniqueProductsAux ((ax,bx,cx):xs) y@(ay,by)
@@ -116,7 +130,14 @@ module PrintPrice
 
 
 
-
+        {-  outputToFile search tuple1 tuple2
+            
+            PRE:            
+            RETURNS:        
+            SIDE EFFECTS:   
+            VARIANT:        
+            EXAMPLES:            
+        -} 
         outputToFile :: String -> WebInfo -> WebInfo -> IO ()
         outputToFile search tuple1 tuple2 = do
             writeFile (search ++ ".csv" ) (firstTitle ++ ";" ++ (fst tuple1) ++ ";" ++ (fst tuple2) ++ "\n")
