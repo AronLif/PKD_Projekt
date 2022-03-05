@@ -99,7 +99,7 @@ module PrintPrice
             this functions checks the (y:ys) list and 
             PRE:       
             RETURNS:       
-            VARIANT:     
+            VARIANT:     test
             EXAMPLES:   
         -}
         addUniqueProducts :: MergedProductInfo-> ProductsInfo -> MergedProductInfo
