@@ -1,84 +1,82 @@
+module PrintPrice
+    where
+
+   
+        {-SingleProductInfo
+        this represents the data name and prise of a single product
+        -}
+        type SingleProductInfo = (String, String)
+
+        {- MergedProductInfo
+        This represents the combined data on each prduct taken from both websites        
+        -}
+        type MergedProductInfo = [(String,String,String)]
+        
+        {- CsvInfo
+        This represents the String printed to the CSV with all the info in the produkts
+        and all te speciall characthers for structuring the look in the CSV file
+        -}
+        type CsvInfo = String
+        
+        {- ProductInfo
+        This represents the list that contains all tuples of product info
+        -}
+        type ProductsInfo = [SingleProductInfo]
+
+        {- WebsiteName
+        Represents the string in WebInfo that is the name of the website
+        This is just to make things clearer
+        -}
+        type WebsiteName = String     
+        
+        {-WebInfo
+        This represents the tuple that has all the info from the webcrawler
+        -}
+        type WebInfo = (WebsiteName,ProductsInfo)
+
+        firstTitle = "modell"
+
+        
+        createCsvText :: MergedProductInfo -> CsvInfo
+        createCsvText [] = []
+        createCsvText ((a,b,c):xs) = 
+            a ++ ";" ++ b ++ ";" ++ c ++ "\n" ++ createCsvText xs
+
+               
+        mergeProductInfo :: ProductsInfo -> ProductsInfo -> MergedProductInfo
+        mergeProductInfo tupleX tupleY = 
+            (matchProducts tupleX tupleY) ++ (addUniqeProduct (matchProducts tupleX tupleY) tupleY)
+
+
+        matchProducts :: ProductsInfo -> ProductsInfo -> MergedProductInfo
+        matchProducts [] _ = []
+        matchProducts (x:xs) webList =
+            matchProductsAux x webList ++ (matchProducts xs webList)
+
+        
+        matchProductsAux :: SingleProductInfo -> ProductsInfo -> MergedProductInfo
+        matchProductsAux (a,b) [] = [(a,b,"--")]
+        matchProductsAux (a,b) (y:ys) =
+            if a == fst y then [(a,b,snd y)]
+            else matchProductsAux (a,b) ys
+
+
+        addUniqeProduct :: MergedProductInfo-> ProductsInfo -> MergedProductInfo
+        addUniqeProduct webList [] = []
+        addUniqeProduct webList (y:ys) =
+            (addUniqeProductAux webList y ) ++ (addUniqeProduct webList ys)
+
+        
+        addUniqeProductAux :: MergedProductInfo -> SingleProductInfo -> MergedProductInfo
+        addUniqeProductAux [] y@(ay,by) = [(ay,"--",by)]
+        addUniqeProductAux ((ax,bx,cx):xs) y@(ay,by)
+            | ax == ay = []
+            | otherwise = addUniqeProductAux xs y
 
 
 
-webbhallen = ("Webbhallen",[("rtx 3060",2300),("rtx3070", 4200),("rtx3080", 12000)])
 
-komplett = ("Komplett",[("rtx 3060",2400),("rtx3070", 4500),("rtx3080", 11000)])
-
-netonnet = ("Net on Net",[("rtx 3050", 1000),("rtx 3060",2700),("rtx3070", 3300),("rtx3080", 14000)])
-
-
-
-
-mergeTuple tuple1 tuple2 tuple3 = 
-    [((fst tuple1),(fst tuple2),(fst tuple3))]
-
-
-
-tupleToList tuple1 tuple2 tuple3 = merge (snd tuple1) (snd tuple2) (snd tuple3)
-
-merge (x:xs) (y:ys) (z:zs) = 
-    mergeAUX x (y:ys) (z:zs)
-    
--- mergeAUX (a,b) [] = []
-mergeAUX (a,b) (y:ys) (z:zs) =
-    sndMerge (fstMerge (a,b) (y:ys)) (z:zs)
-
-fstMerge :: (String,Integer) -> [(String,Integer)] -> (String,Integer,Integer)
-fstMerge (a,b) [] = (a,b,0)
-fstMerge (a,b) (y:ys) = 
-    if a == fst y then (a,b,snd y)
-    else fstMerge (a,b) ys
-
-sndMerge (a,b,c) [] = (a,b,c,0)
-sndMerge (a,b,c) (z:zs) = 
-    if a == fst z then (a,b,c,snd z)
-    else sndMerge (a,b,c) zs
-
-tupleToString (a,b,c,d) = a ++ ";" ++ (show b) ++";" ++ (show c) ++ ";" ++ (show d) 
-
-
-createFile tuple1 tuple2 tuple3 = do
-    writeFile "RTX card name.csv" ("model;" ++ fst tuple1 ++ 
-                                    ";" ++ fst tuple2 ++ ";"
-                                    ++ fst tuple3 ++ "n")
-    appendFile "RTX card name.csv" (tupleToString (tupleToList tuple1 tuple2 tuple3))
-
-    
-
--- test
-
--- TODO:
--- börja med att skapa en CSV fil
--- Printa första raden i CSV filen: Model,butik1,butik2,butik3
---
---
---
---
---
---
-
-{-
-storeName :: (String,b) -> String 
-storeName tuple = fst tuple
-
-
-strToPrint :: [String] -> [IO ()]
-strToPrint store = 
-    map putStrLn store
-
-
-printShopAux tupl1 tupl2 tupl3 = 
-    printShop 
-
-printShop tupl1 tupl2 tupl3 = do
-    webside1 <- strToPrint (storeName webhallen)
-    webside2 <- strToPrint (storeName complett)
-    webside3 <- strToPrint (storeName netonnet)
-    putStrLn (("Graffikkort-namn     pris på ") ++ webside1 ++ " pris på " ++ webside2 ++ " pris på " ++ webside3 )
--}
-{-
-printShop tupl1 tupl2 tupl3 = do
-    webside1 <- map putStr (fst tupl1)
-    putStrLn (("Graffikkort-namn     pris på ") ++ webside1)
-    -}
+        outputToFile :: String -> WebInfo -> WebInfo -> IO ()
+        outputToFile search tuple1 tuple2 = do
+            writeFile (search ++ ".csv" ) (firstTitle ++ ";" ++ (fst tuple1) ++ ";" ++ (fst tuple2) ++ "\n")
+            appendFile (search ++ ".csv") (createCsvText (mergeProductInfo (snd tuple1) (snd tuple2)))
