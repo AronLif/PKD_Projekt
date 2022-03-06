@@ -131,12 +131,12 @@ module PrintPrice
 
 
         {-  outputToFile search tuple1 tuple2
-            
-            PRE:            
-            RETURNS:        
-            SIDE EFFECTS:   
-            VARIANT:        
-            EXAMPLES:            
+            this takes a searchterm and two tuples with info scraped from websides.
+            it calls on helper functions inorder to merge the info from the websides and then creates a CSV file 
+            that it writes out the data on to.
+            PRE:            True
+            SIDE EFFECTS:   Creates a file with data in it
+            EXAMPLES:       
         -} 
         outputToFile :: String -> WebInfo -> WebInfo -> IO ()
         outputToFile search tuple1 tuple2 = do
