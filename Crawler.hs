@@ -4,25 +4,43 @@ module Crawler
         import Text.HTML.Scalpel ( texts, scrapeStringLike, (@:), hasClass )
         import Data.List ( isInfixOf )
         import Network.Curl ( curlGetString )
-        import PrintPrice 
+        import PrintPrice ( outputToFile ) 
         
+        {- URL 
+            Reprsent a url for a website 
+        -}
         type URL = String
+
+        {- ProductList
+            Represents the list of of tuples we obtain from the crawler
+            with a name as the first item and the price as the second
+        -}
         type ProductList = [(String,String)]
+
+        {- HTMLCode
+            Represents the string of HTML source code we get when curling the url
+        -}
         type HTMLCode = String
 
+        {- Crawler name series
+          curls down the HTML code and then filters all the products using the name and series
+        RETURNS: Products from the websites
+        SIDE EFFECTS: Curls down a website
+        EXAMPLE: crawler "MSI" "3080" == outpuToFile ("MSI" ++ "_" ++ "3080") ("Komplett",(komplettCrawler name serie (snd komplettHTML))) ("Inet",(inetCrawler name (snd inetHTML)))
+        -}
         crawler :: String -> String -> IO ()
         crawler name serie = do  
           komplettHTML <- curlGetString komplettUrl []
           if serie == "3060" then do
                 inetHTML <- curlGetString inet3060 []
-                outputToFile (name ++ " " ++ serie) ("Komplett",(komplettCrawler name serie (snd komplettHTML))) ("Inet",(inetCrawler name (snd inetHTML)))
+                outputToFile (name ++ "_" ++ serie) ("Komplett",(komplettCrawler name serie (snd komplettHTML))) ("Inet",(inetCrawler name (snd inetHTML)))
           else if serie == "3070" then do 
                 inetHTML <- curlGetString inet3070 []
-                outputToFile (name ++ " " ++ serie) ("Komplett",(komplettCrawler name serie (snd komplettHTML))) ("Inet",(inetCrawler name (snd inetHTML)))     
+                outputToFile (name ++ "_" ++ serie) ("Komplett",(komplettCrawler name serie (snd komplettHTML))) ("Inet",(inetCrawler name (snd inetHTML)))     
           else do 
                 inetHTML <- curlGetString inet3080 []
                 inetTIHTML <- curlGetString inet3080ti []
-                outputToFile (name ++ " " ++ serie) ("Komplett",(komplettCrawler name serie (snd komplettHTML))) ("Inet",(inetCrawler name (snd inetHTML))++(inetCrawler name (snd inetTIHTML)))
+                outputToFile (name ++ "_" ++ serie) ("Komplett",(komplettCrawler name serie (snd komplettHTML))) ("Inet",(inetCrawler name (snd inetHTML))++(inetCrawler name (snd inetTIHTML)))
 
 
         {- komplettCrawler name serie htmlCode
@@ -73,7 +91,7 @@ module Crawler
 
 
         {- komplettName htmlCOde
-          fids all instances of text inside "h2" 
+          finds all instances of text inside "h2" 
         RETURNS: a list with a instances found as strings
         EXAMPLES: komplettName "<!DOCTYPE html> <html> <span class='product-price-now'>2500</span> <h2>RTX 3080</h2> </html>" == ["RTX 3080"]
                   komplettName "" == []
@@ -172,7 +190,3 @@ module Crawler
         inet3080ti = "https://www.inet.se/kategori/164/grafikkort-gpu?filters=%7B%2229%22%3A%7B%22type%22%3A%22PropAny%22%2C%22any%22%3A%5B15734%5D%7D%7D"
         komplettUrl :: URL
         komplettUrl = "https://www.komplett.se/category/10412/datorutrustning/datorkomponenter/grafikkort?nlevel=10000%C2%A728003%C2%A710412&sort=PriceDesc%3ADESCENDING&hits=336"
-
-        {-
-        Some mock html codes used for test cases and for examples
-        -}
